@@ -10,20 +10,34 @@ void processInput(GLFWwindow* window);
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
+
 // Vertex shader source code
 const char* vertexShaderSource = "#version 330 core\n"
-"layout (location = 0) in vec3 aPos;\n" // The location is 0, and attribute is a vec3.
+"layout (location = 0) " // The location of the vertex attribute is 0.
+"in vec3 aPos;\n" // The position is 0, and attribute is a vec3.
+"out vec4 vertexColor;\n" // Output a color to the fragment shader.
 "void main()\n"
 "{\n"
 "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n" // gl_Position is a special variable that holds the output position of the vertex shader.
+"   vertexColor = vec4(0.5, 0.5, 0.0, 1.0);\n" // Set the output variable to a vec4 color. (RGBA)
 "}\0";
+
 // Fragment shader source code
 const char* fragmentShaderSource = "#version 330 core\n"
+"in vec4 vertexColor;\n" // The input variable from the vertex shader (same name and same type).
 "out vec4 FragColor;\n" // The output variable from this shader is a vec4 that is used as the fragment's color.
 "void main()\n"
 "{\n"
-"   FragColor = vec4(0.3f, 0.3f, 1.0f, 1.0f);\n" // Set the output variable to a vec4 color. (RGBA)
+"   FragColor = vertexColor;\n" // Set the output variable to a vec4 color. (RGBA)
 "}\0";
+
+//while writing glsl, (for example fragment shader) should i write in first or out first? 
+//in the fragment shader, you should write out first. WHY, explain
+//The out keyword is used to declare an output variable in a shader. The output variable from the vertex shader is the input variable of the fragment shader.
+//The in keyword is used to declare an input variable in a shader. The input variable of the fragment shader is the output variable of the vertex shader.
+//Should i always write out first in any glsl shader?
+//No, you should write in first in the vertex shader. The input variable of the vertex shader is the output variable of the vertex shader.
+//
 
 
 
@@ -91,6 +105,7 @@ int main() {
 		std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl; // Print the error message.
 	}
 
+
 	// Link shaders
 	// Create a shader program object. A shader program object is the final linked version of multiple shaders combined.
 	unsigned int shaderProgram = glCreateProgram(); // Create a shader program object.
@@ -106,6 +121,13 @@ int main() {
 		glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog); // Get the error message.
 		std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl; // Print the error message.
 	}
+
+
+	//int nrAttributes;
+	//glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
+	//std::cout << "Maximum nr of vertex attributes supported: " << nrAttributes << std::endl;
+	// It is 16 on my computer.
+
 
 	// Use the shader program object
 	glUseProgram(shaderProgram);
@@ -174,8 +196,8 @@ int main() {
 
 
 	// Wireframe & Fill modes
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // uncomment to draw in wireframe mode.
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); // Draw in fill mode.
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // uncomment to draw in wireframe mode.
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); // Draw in fill mode.
 
 
 
