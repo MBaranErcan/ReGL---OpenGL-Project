@@ -2,6 +2,7 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 
+#include "Shaders/Shader.h"
 
 void void_framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
@@ -9,36 +10,6 @@ void processInput(GLFWwindow* window);
 // Settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
-
-
-// Vertex shader source code
-const char* vertexShaderSource = "#version 330 core\n"
-"layout (location = 0) " // The location of the vertex attribute is 0.
-"in vec3 aPos;\n" // The position is 0, and attribute is a vec3.
-"out vec4 vertexColor;\n" // Output a color to the fragment shader.
-"void main()\n"
-"{\n"
-"   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n" // gl_Position is a special variable that holds the output position of the vertex shader.
-"   vertexColor = vec4(0.5, 0.5, 0.0, 1.0);\n" // Set the output variable to a vec4 color. (RGBA)
-"}\0";
-
-// Fragment shader source code
-const char* fragmentShaderSource = "#version 330 core\n"
-"in vec4 vertexColor;\n" // The input variable from the vertex shader (same name and same type).
-"out vec4 FragColor;\n" // The output variable from this shader is a vec4 that is used as the fragment's color.
-"void main()\n"
-"{\n"
-"   FragColor = vertexColor;\n" // Set the output variable to a vec4 color. (RGBA)
-"}\0";
-
-//while writing glsl, (for example fragment shader) should i write in first or out first? 
-//in the fragment shader, you should write out first. WHY, explain
-//The out keyword is used to declare an output variable in a shader. The output variable from the vertex shader is the input variable of the fragment shader.
-//The in keyword is used to declare an input variable in a shader. The input variable of the fragment shader is the output variable of the vertex shader.
-//Should i always write out first in any glsl shader?
-//No, you should write in first in the vertex shader. The input variable of the vertex shader is the output variable of the vertex shader.
-//
-
 
 
 int main() {
@@ -69,81 +40,19 @@ int main() {
 		return -1;
 	}
 
-
 	// ------------------------SHADERS------------------------
-	// ------------------------VERTEX SHADER------------------------
+	Shader myShader("Shaders/Texture.vert", "Shaders/Texture.frag"); // Create a shader object and read the vertex and fragment shader files.
 
-	// Create a vertex shader object
-	unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER); // Create a shader object
-
-	// Attach the shader source code to the shader object and compile the shader.
-	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL); // Attach the shader source code to the shader object.
-	glCompileShader(vertexShader); // Compile the shader.
-
-	// Check if the shader compilation was successful
-	int success;
-	char infoLog[512];
-	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success); // Get the compilation status of the shader.
-	if (!success) {
-		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog); // Get the error message.
-		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl; // Print the error message.
-	}
-
-
-	// ------------------------FRAGMENT SHADER------------------------
-	// Create a fragment shader object
-	unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER); // Create a shader object
-
-	// Attach the shader source code to the shader object and compile the shader.
-	glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL); // Attach the shader source code to the shader object.
-	glCompileShader(fragmentShader); // Compile the shader.
-
-	// Check if the shader compilation was successful
-	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success); // Get the compilation status of the shader.
-	if (!success) {
-		glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog); // Get the error message.
-		std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl; // Print the error message.
-	}
-
-
-	// Link shaders
-	// Create a shader program object. A shader program object is the final linked version of multiple shaders combined.
-	unsigned int shaderProgram = glCreateProgram(); // Create a shader program object.
-
-	// Attach the vertex and fragment shaders to the shader program object.
-	glAttachShader(shaderProgram, vertexShader);
-	glAttachShader(shaderProgram, fragmentShader);
-	glLinkProgram(shaderProgram); // Link the shaders.
-
-	// Check if the shader linking was successful
-	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success); // Get the linking status of the shader program.
-	if (!success) {
-		glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog); // Get the error message.
-		std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl; // Print the error message.
-	}
-
-
-	//int nrAttributes;
-	//glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
-	//std::cout << "Maximum nr of vertex attributes supported: " << nrAttributes << std::endl;
-	// It is 16 on my computer.
-
-
-	// Use the shader program object
-	glUseProgram(shaderProgram);
-
-	// Delete the shader objects once we've linked them into a shader program; we no longer need them.
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
-
+	
 
 	// -------------------RECTANGLE-------------------
 	// vertices
 	float vertices[] = {
-		-0.5f, -0.5f, 0.0f, // Top left
-		0.5f, 0.5f, 0.0f, // Top right
-		0.5f, -0.5f, 0.0f, // Bottom right
-		-0.5f, 0.5f, 0.0f // Bottom left
+		// positions			// colors
+		-0.5f, -0.5f, 0.0f,	1.0f, 0.0f, 0.0f, // Top left
+		 0.5f,	0.5f, 0.0f,	0.0f, 1.0f, 0.0f, // Top right
+		 0.5f, -0.5f, 0.0f,	1.0f, 1.0f, 0.0f, // Bottom right
+		-0.5f,	0.5f, 0.0f,	0.0f, 0.0f, 1.0f, // Bottom left
 	};
 	unsigned int indices[] = {	// Instead of drawing the rectangle with 6 vertices, we can draw it with 2 triangles using 4 vertices.
 			0, 1, 2, // First Triangle
@@ -180,7 +89,8 @@ int main() {
 
 
 	// Specify how OpenGL should interpret the vertex data before rendering.
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0); 
+	// Position attribute
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0); // Specify the vertex attributes using glVertexAttribPointer.
 	// The first parameter specifies which vertex attribute we want to configure. Remember, we specified the location of the position vertex attribute in the vertex shader with layout (location = 0).
 	// The second parameter specifies the size of the vertex attribute. The vertex attribute is a vec3 so it is composed of 3 values. (x, y, z)
 	// The third parameter specifies the type of the data which is GL_FLOAT (a vec* in GLSL consists of floating point values).
@@ -188,7 +98,9 @@ int main() {
 	// The fifth parameter specifies the stride between consecutive vertex attributes. Since the next set of position data is located exactly 3 times the size of a float away, we specify 3 * sizeof(float) as the stride.
 	// The last parameter specifies the offset of where the position data begins in the buffer. Since the position data is at the start of the data array, we specify 0.
 	glEnableVertexAttribArray(0); // Enable the vertex attribute at location 0.
-
+	// Color attribute
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float))); // Specify the vertex color attributes using glVertexAttribPointer.
+	glEnableVertexAttribArray(1); // Enable the vertex attribute at location 1.
 
 	// Unbind the VBO and VAO. This is good practice so we don't accidentally modify the VBO and VAO while we're not using them.
 	glBindBuffer(GL_ARRAY_BUFFER, 0); // Unbind the VBO.
@@ -196,9 +108,14 @@ int main() {
 
 
 	// Wireframe & Fill modes
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // uncomment to draw in wireframe mode.
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); // Draw in fill mode.
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // uncomment to draw in wireframe mode.
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); // Draw in fill mode.
 
+
+	//int nrAttributes;
+	//glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
+	//std::cout << "Maximum nr of vertex attributes supported: " << nrAttributes << std::endl;
+	// It is 16 on my computer.
 
 
 	// RENDER LOOP
@@ -206,12 +123,17 @@ int main() {
 
 		processInput(window); // Check if the user has pressed the escape key, if so, close the window.
 
+		// Render
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f); // Set the color to clear the screen with.
 		glClear(GL_COLOR_BUFFER_BIT); // Clear the screen with the set color.
 	
 
 		// Draw the rectangle
-		glUseProgram(shaderProgram); // Use the shader program object.
+		myShader.use(); // Use the shader program.
+		glBindVertexArray(VAO); // Bind the VAO.
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0); // Draw the rectangle using the VAO and EBO.
+
+
 		glBindVertexArray(VAO); // Bind the VAO.
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0); // Draw the rectangle using the VAO and EBO.
 		glBindVertexArray(0); // Unbind the VAO.
@@ -227,7 +149,7 @@ int main() {
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &VBO);
 	glDeleteBuffers(1, &EBO);
-	glDeleteProgram(shaderProgram);
+
 
 	// Clean up
 	glfwTerminate(); // Clean up the resources we've allocated.
@@ -245,6 +167,6 @@ void processInput(GLFWwindow* window) {
 
 // CALLBACK FUNCTIONS
 void void_framebuffer_size_callback(GLFWwindow* window, int width, int height)
-{
+{		// Whenever the window is resized, this callback function executes. It adjusts the viewport so that the OpenGL renders to the new window size.
 		glViewport(0, 0, width, height);
 }
