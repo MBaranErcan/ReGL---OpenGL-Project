@@ -26,9 +26,17 @@
     <ClInclude Include="Shaders\Shader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Dependencies\stb_image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\Texture.frag" />
     <None Include="Shaders\Texture.vert" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Textures\wall.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>
