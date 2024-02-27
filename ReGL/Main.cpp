@@ -4,6 +4,11 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 
+// GLM Mathematics Library
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 #include "Dependencies/stb_image.h"
 #include "Shaders/Shader.h"
 
@@ -123,10 +128,8 @@ int main() {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); // GL_REPEAT - S
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT); // GL_REPEAT - T
 	//glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_REPEAT); // GL_REPEAT - R
-
-	float borderColor[] = { 0.0f, 0.0f, 1.0f, 1.0f }; // RGBA
-	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor); // Set the border color to blue.
 	
+
 	// Texture Filtering
 	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); // GL_LINEAR is better for downscaling.
 	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // GL_LINEAR is better for upscaling.
@@ -179,6 +182,13 @@ int main() {
 	myShader.setInt("texture2", 1); // Set the texture2 sampler to the texture unit 1.
 
 
+	// Transformations (Trans
+	glm::mat4 transform = glm::mat4(1.0f); // Initialize the transformation matrix as the identity matrix.
+	transform = glm::translate(transform, glm::vec3(-0.25f, 0.0f, 0.0f)); // Translate the transformation matrix.
+	transform = glm::rotate(transform, glm::radians(45.0f), glm::vec3(0.0f, 0.0f, 1.0f)); // Rotate the transformation matrix by 45 degrees on the z-axis.
+	transform = glm::scale(transform, glm::vec3(0.5f, 0.5f, 0.5f)); // Scale the transformation matrix.
+
+	//----------------------------------------------------
 	// RENDER LOOP
 	while (!glfwWindowShouldClose(window)) { // Check if the window should close, if not, render the next frame.
 
@@ -196,15 +206,19 @@ int main() {
 		glBindTexture(GL_TEXTURE_2D, texture2); // Bind the texture so that all subsequent texture commands will configure the currently bound texture.
 
 
+
 		// Draw the rectangle
 		myShader.use(); // Use the shader program.
+		unsigned int transformLoc = glGetUniformLocation(myShader.ID, "transform"); // Get the location of the uniform variable "transform" in the shader program.
+		glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform)); // Set the value of the uniform variable "transform" in the shader program.
+
 		glBindVertexArray(VAO); // Bind the VAO.
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0); // Draw the rectangle using the VAO and EBO.
 		glBindVertexArray(0); // Unbind the VAO.
 
 
-		glfwPollEvents(); // Check if any events are triggered (like keyboard input or mouse movement events).
 		glfwSwapBuffers(window); // Swap the front and back buffers so the user can see the output.
+		glfwPollEvents(); // Check if any events are triggered (like keyboard input or mouse movement events).
 	
 	}
 
