@@ -120,6 +120,7 @@ int main() {
 
 
 	// -------------------TEXTURE-------------------
+	// Texture 1
 	unsigned int texture1, texture2;
 	glGenTextures(1, &texture1); // Generate 1 texture and store the resulting identifier in texture.
 	glBindTexture(GL_TEXTURE_2D, texture1); // Bind the texture so that all subsequent texture commands will configure the currently bound texture.
@@ -152,6 +153,7 @@ int main() {
 	}
 	stbi_image_free(data); // Free the image memory.
 
+	//------------
 	// Texture 2
 	glGenTextures(1, &texture2); // Generate the second texture.
 	glBindTexture(GL_TEXTURE_2D, texture2); // Bind the second texture so subsequent texture commands will configure only the second texture.
@@ -211,6 +213,24 @@ int main() {
 		myShader.use(); // Use the shader program.
 		unsigned int transformLoc = glGetUniformLocation(myShader.ID, "transform"); // Get the location of the uniform variable "transform" in the shader program.
 		glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform)); // Set the value of the uniform variable "transform" in the shader program.
+
+
+		// Set the model, view, and projection matrices
+		glm::mat4 model = glm::mat4(1.0f); // Initialize the model matrix as the identity matrix.
+		glm::mat4 view = glm::mat4(1.0f); // Initialize the view matrix as the identity matrix.
+		glm::mat4 projection = glm::mat4(1.0f); // Initialize the projection matrix as the identity matrix.
+		
+		model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f)); // Rotate the model matrix.
+		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f)); // Translate the view matrix.
+		projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f); // Set the projection matrix.
+
+		unsigned int modelLoc = glGetUniformLocation(myShader.ID, "model"); // Get the location of the uniform variable "model" in the shader program.
+		unsigned int viewLoc = glGetUniformLocation(myShader.ID, "view"); // Get the location of the uniform variable "view" in the shader program.
+
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)); // Set the value of the uniform variable "model" in the shader program.
+		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view)); // Set the value of the uniform variable "view" in the shader program.
+
+		myShader.setMat4("projection", projection); // Set the value of the uniform variable "projection" in the shader program.
 
 		glBindVertexArray(VAO); // Bind the VAO.
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0); // Draw the rectangle using the VAO and EBO.

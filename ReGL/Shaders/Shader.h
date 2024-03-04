@@ -101,6 +101,12 @@ public:
 		glUniform1f(glGetUniformLocation(ID, name.c_str()), value);
 	}
 
+	// This function is used to set a 4x4 matrix uniform in the shader.
+	void setMat4(const std::string& name, const glm::mat4& mat) const 
+	{
+		glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
+	}
+
 
 // Explanations:
 // 1. The constructor reads and builds the shader with this line of code: Shader(const char* vertexPath, const char* fragmentPath);
