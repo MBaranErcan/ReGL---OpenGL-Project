@@ -12,8 +12,9 @@
 #include "Dependencies/stb_image.h"
 #include "Shaders/Shader.h"
 
-void void_framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void processInput(GLFWwindow* window);
+
+void void_framebuffer_size_callback(GLFWwindow* window, int width, int height);	// Whenever the window is resized, this callback function executes. It adjusts the viewport so that the OpenGL renders to the new window size.
+void processInput(GLFWwindow* window);											// Check if the user has pressed the escape key, if so, close the window.
 
 // Settings
 const unsigned int SCR_WIDTH = 800;
@@ -48,23 +49,71 @@ int main() {
 		return -1;
 	}
 
+	// -----------------------------
+	// configure global opengl state
+	glEnable(GL_DEPTH_TEST);
+
 	// ------------------------SHADERS------------------------
 	Shader myShader("Shaders/Texture.vert", "Shaders/Texture.frag"); // Create a shader object and read the vertex and fragment shader files.
 
 	
 
-	// -------------------RECTANGLE-------------------
-	// vertices
+	// --------------------------------------
+	// Cube vertices
 	float vertices[] = {
 		// positions			// colors			// texture coords
-		 0.5f,  0.5f, 0.0f,		1.0f, 0.0f, 0.0f,   1.0f, 1.0f,	// top right
-		 0.5f, -0.5f, 0.0f,		0.0f, 1.0f, 0.0f,   1.0f, 0.0f,	// bottom right
-		-0.5f, -0.5f, 0.0f,		0.0f, 0.0f, 1.0f,   0.0f, 0.0f,	// bottom left
-		-0.5f,  0.5f, 0.0f,		1.0f, 1.0f, 0.0f,	0.0f, 1.0f	// top left 
+		// 4 vertices (front) for the cube
+		 0.5f,  0.5f, 0.5f,		1.0f, 0.0f, 0.0f,   1.0f, 1.0f,	// front-top right
+		 0.5f, -0.5f, 0.5f,		0.0f, 1.0f, 0.0f,   1.0f, 0.0f,	// front-bottom right
+		-0.5f, -0.5f, 0.5f,		0.0f, 0.0f, 1.0f,   0.0f, 0.0f,	// front-bottom left
+		-0.5f,  0.5f, 0.5f,		1.0f, 1.0f, 0.0f,	0.0f, 1.0f,	// front-top left 
+		// 4 vertices (right) for the cube
+		 0.5f,  0.5f,  0.5f,		1.0f, 0.0f, 0.0f,   1.0f, 1.0f,	// front-top right
+		 0.5f, -0.5f,  0.5f,		0.0f, 1.0f, 0.0f,   1.0f, 0.0f,	// front-bottom right
+		 0.5f, -0.5f, -0.5f,		0.0f, 0.0f, 1.0f,   0.0f, 0.0f,	// back-bottom right
+		 0.5f,  0.5f, -0.5f,		1.0f, 1.0f, 0.0f,	0.0f, 1.0f,	// back-top right
+		// 4 vertices (left) for the cube
+		-0.5f,  0.5f, -0.5f,	1.0f, 0.0f, 0.0f,   1.0f, 1.0f,	// back-top left
+		-0.5f, -0.5f, -0.5f,	0.0f, 1.0f, 0.0f,   1.0f, 0.0f,	// back-bottom left
+		-0.5f, -0.5f,  0.5f,	0.0f, 0.0f, 1.0f,   0.0f, 0.0f,	// front-bottom left
+		-0.5f,  0.5f,  0.5f,	1.0f, 1.0f, 0.0f,	0.0f, 1.0f,	// front-top left		
+		// 4 vertices (back) for the cube		 
+		 0.5f,  0.5f, -0.5f,		1.0f, 0.0f, 0.0f,   1.0f, 1.0f,	// back-top right
+		 0.5f, -0.5f, -0.5f,		0.0f, 1.0f, 0.0f,   1.0f, 0.0f,	// back-bottom right
+		-0.5f, -0.5f, -0.5f,		0.0f, 0.0f, 1.0f,   0.0f, 0.0f,	// back-bottom left
+		-0.5f,  0.5f, -0.5f,		1.0f, 1.0f, 0.0f,	0.0f, 1.0f,	// back-top left
+		// 4 vertices (top) for the cube
+		 0.5f,  0.5f, -0.5f,		1.0f, 0.0f, 0.0f,   1.0f, 1.0f,	// back-top right
+		 0.5f,  0.5f,  0.5f,		0.0f, 1.0f, 0.0f,   1.0f, 0.0f,	// front-top right
+		-0.5f,  0.5f,  0.5f,		0.0f, 0.0f, 1.0f,   0.0f, 0.0f,	// front-top left
+		-0.5f,  0.5f, -0.5f,		1.0f, 1.0f, 0.0f,	0.0f, 1.0f,	// back-top left
+		 // 4 vertices (bottom) for the cube
+		 0.5f, -0.5f,  0.5f,		1.0f, 0.0f, 0.0f,   1.0f, 1.0f,	// front-bottom right
+		 0.5f, -0.5f, -0.5f,		0.0f, 1.0f, 0.0f,   1.0f, 0.0f,	// back-bottom right
+		-0.5f, -0.5f, -0.5f,		0.0f, 0.0f, 1.0f,   0.0f, 0.0f,	// back-bottom left
+		-0.5f, -0.5f,  0.5f,		1.0f, 1.0f, 0.0f,	0.0f, 1.0f,	// front-bottom left
 	};
+	
+
 	unsigned int indices[] = {	// Instead of drawing the rectangle with 6 vertices, we can draw it with 2 triangles using 4 vertices.
-			0, 1, 3, // First Triangle
-			1, 2, 3 // Second Triangle
+		// Front
+		0, 3, 1, // First tri
+		1, 3, 2, // Second tri
+		// Right
+		4, 7, 5, // First tri
+		5, 7, 6, // Second tri
+		// Left
+		8, 11, 9, // First tri
+		9, 11, 10, // Second tri
+		// Back
+		12, 15, 13, // First tri
+		13, 15, 14, // Second tri
+		// Top
+		16, 19, 17, // First tri
+		17, 19, 18, // Second tri
+		// Bottom
+		20, 23, 21, // First tri
+		21, 23, 22, // Second tri
 		};
 
 
@@ -116,7 +165,6 @@ int main() {
 	//int nrAttributes;
 	//glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
 	//std::cout << "Maximum nr of vertex attributes supported: " << nrAttributes << std::endl;
-	// It is 16 on my computer.
 
 
 	// -------------------TEXTURE-------------------
@@ -132,10 +180,7 @@ int main() {
 	
 
 	// Texture Filtering
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); // GL_LINEAR is better for downscaling.
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // GL_LINEAR is better for upscaling.
-
-	// Texture Filtering by using Mipmaps
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); // Use nearest neighbor filtering for minifying the texture.
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); // Use mipmaps for minifying the texture.
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // Use linear filtering for magnifying the texture. Mipmaps are not useful here.
 
@@ -184,9 +229,9 @@ int main() {
 	myShader.setInt("texture2", 1); // Set the texture2 sampler to the texture unit 1.
 
 
-	// Transformations (Trans
+	// Transformations (Translate, Rotate, Scale)
 	glm::mat4 transform = glm::mat4(1.0f); // Initialize the transformation matrix as the identity matrix.
-	transform = glm::translate(transform, glm::vec3(-0.25f, 0.0f, 0.0f)); // Translate the transformation matrix.
+	transform = glm::translate(transform, glm::vec3(-0.0f, -0.0f, -3.0f)); // Translate the transformation matrix.
 	transform = glm::rotate(transform, glm::radians(45.0f), glm::vec3(0.0f, 0.0f, 1.0f)); // Rotate the transformation matrix by 45 degrees on the z-axis.
 	transform = glm::scale(transform, glm::vec3(0.5f, 0.5f, 0.5f)); // Scale the transformation matrix.
 
@@ -198,8 +243,7 @@ int main() {
 
 		// Render
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f); // Set the color to clear the screen with.
-		glClear(GL_COLOR_BUFFER_BIT); // Clear the screen with the set color.
-	
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear the screen's color and depth buffer.
 
 		glActiveTexture(GL_TEXTURE0); // Activate the texture unit first before binding the texture.
 		glBindTexture(GL_TEXTURE_2D, texture1); // Bind the texture so that all subsequent texture commands will configure the currently bound texture.
@@ -215,14 +259,15 @@ int main() {
 		glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform)); // Set the value of the uniform variable "transform" in the shader program.
 
 
-		// Set the model, view, and projection matrices
+		// Set the model, view, and projection matrices.
 		glm::mat4 model = glm::mat4(1.0f); // Initialize the model matrix as the identity matrix.
 		glm::mat4 view = glm::mat4(1.0f); // Initialize the view matrix as the identity matrix.
 		glm::mat4 projection = glm::mat4(1.0f); // Initialize the projection matrix as the identity matrix.
 		
 		model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f)); // Rotate the model matrix.
-		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f)); // Translate the view matrix.
+		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -5.0f)); // Translate the view matrix.
 		projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f); // Set the projection matrix.
+
 
 		unsigned int modelLoc = glGetUniformLocation(myShader.ID, "model"); // Get the location of the uniform variable "model" in the shader program.
 		unsigned int viewLoc = glGetUniformLocation(myShader.ID, "view"); // Get the location of the uniform variable "view" in the shader program.
@@ -233,7 +278,7 @@ int main() {
 		myShader.setMat4("projection", projection); // Set the value of the uniform variable "projection" in the shader program.
 
 		glBindVertexArray(VAO); // Bind the VAO.
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0); // Draw the rectangle using the VAO and EBO.
+		glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(indices[0]), GL_UNSIGNED_INT, 0); // Draw the rectangle using the VAO and EBO.
 		glBindVertexArray(0); // Unbind the VAO.
 
 
