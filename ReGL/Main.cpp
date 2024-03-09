@@ -20,6 +20,15 @@ void processInput(GLFWwindow* window);											// Check if the user has presse
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
+// Camera
+glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f); // Set the camera position.
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f); // Set the camera front.
+glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f); // Set the camera up.
+
+// Timing
+float deltaTime = 0.0f; // Time between current frame and last frame.
+float lastFrame = 0.0f; // Time of last frame.
+
 
 int main() {
 
@@ -68,30 +77,30 @@ int main() {
 		-0.5f, -0.5f, 0.5f,		0.0f, 0.0f, 1.0f,   0.0f, 0.0f,	// front-bottom left
 		-0.5f,  0.5f, 0.5f,		1.0f, 1.0f, 0.0f,	0.0f, 1.0f,	// front-top left 
 		// 4 vertices (right) for the cube
-		 0.5f,  0.5f,  0.5f,		1.0f, 0.0f, 0.0f,   1.0f, 1.0f,	// front-top right
-		 0.5f, -0.5f,  0.5f,		0.0f, 1.0f, 0.0f,   1.0f, 0.0f,	// front-bottom right
-		 0.5f, -0.5f, -0.5f,		0.0f, 0.0f, 1.0f,   0.0f, 0.0f,	// back-bottom right
-		 0.5f,  0.5f, -0.5f,		1.0f, 1.0f, 0.0f,	0.0f, 1.0f,	// back-top right
+		 0.5f,  0.5f,  0.5f,	1.0f, 0.0f, 0.0f,   1.0f, 1.0f,	// front-top right
+		 0.5f, -0.5f,  0.5f,	0.0f, 1.0f, 0.0f,   1.0f, 0.0f,	// front-bottom right
+		 0.5f, -0.5f, -0.5f,	0.0f, 0.0f, 1.0f,   0.0f, 0.0f,	// back-bottom right
+		 0.5f,  0.5f, -0.5f,	1.0f, 1.0f, 0.0f,	0.0f, 1.0f,	// back-top right
 		// 4 vertices (left) for the cube
 		-0.5f,  0.5f, -0.5f,	1.0f, 0.0f, 0.0f,   1.0f, 1.0f,	// back-top left
 		-0.5f, -0.5f, -0.5f,	0.0f, 1.0f, 0.0f,   1.0f, 0.0f,	// back-bottom left
 		-0.5f, -0.5f,  0.5f,	0.0f, 0.0f, 1.0f,   0.0f, 0.0f,	// front-bottom left
 		-0.5f,  0.5f,  0.5f,	1.0f, 1.0f, 0.0f,	0.0f, 1.0f,	// front-top left		
 		// 4 vertices (back) for the cube		 
-		 0.5f,  0.5f, -0.5f,		1.0f, 0.0f, 0.0f,   1.0f, 1.0f,	// back-top right
-		 0.5f, -0.5f, -0.5f,		0.0f, 1.0f, 0.0f,   1.0f, 0.0f,	// back-bottom right
-		-0.5f, -0.5f, -0.5f,		0.0f, 0.0f, 1.0f,   0.0f, 0.0f,	// back-bottom left
-		-0.5f,  0.5f, -0.5f,		1.0f, 1.0f, 0.0f,	0.0f, 1.0f,	// back-top left
+		 0.5f,  0.5f, -0.5f,	1.0f, 0.0f, 0.0f,   1.0f, 1.0f,	// back-top right
+		 0.5f, -0.5f, -0.5f,	0.0f, 1.0f, 0.0f,   1.0f, 0.0f,	// back-bottom right
+		-0.5f, -0.5f, -0.5f,	0.0f, 0.0f, 1.0f,   0.0f, 0.0f,	// back-bottom left
+		-0.5f,  0.5f, -0.5f,	1.0f, 1.0f, 0.0f,	0.0f, 1.0f,	// back-top left
 		// 4 vertices (top) for the cube
-		 0.5f,  0.5f, -0.5f,		1.0f, 0.0f, 0.0f,   1.0f, 1.0f,	// back-top right
-		 0.5f,  0.5f,  0.5f,		0.0f, 1.0f, 0.0f,   1.0f, 0.0f,	// front-top right
-		-0.5f,  0.5f,  0.5f,		0.0f, 0.0f, 1.0f,   0.0f, 0.0f,	// front-top left
-		-0.5f,  0.5f, -0.5f,		1.0f, 1.0f, 0.0f,	0.0f, 1.0f,	// back-top left
+		 0.5f,  0.5f, -0.5f,	1.0f, 0.0f, 0.0f,   1.0f, 1.0f,	// back-top right
+		 0.5f,  0.5f,  0.5f,	0.0f, 1.0f, 0.0f,   1.0f, 0.0f,	// front-top right
+		-0.5f,  0.5f,  0.5f,	0.0f, 0.0f, 1.0f,   0.0f, 0.0f,	// front-top left
+		-0.5f,  0.5f, -0.5f,	1.0f, 1.0f, 0.0f,	0.0f, 1.0f,	// back-top left
 		 // 4 vertices (bottom) for the cube
-		 0.5f, -0.5f,  0.5f,		1.0f, 0.0f, 0.0f,   1.0f, 1.0f,	// front-bottom right
-		 0.5f, -0.5f, -0.5f,		0.0f, 1.0f, 0.0f,   1.0f, 0.0f,	// back-bottom right
-		-0.5f, -0.5f, -0.5f,		0.0f, 0.0f, 1.0f,   0.0f, 0.0f,	// back-bottom left
-		-0.5f, -0.5f,  0.5f,		1.0f, 1.0f, 0.0f,	0.0f, 1.0f,	// front-bottom left
+		 0.5f, -0.5f,  0.5f,	1.0f, 0.0f, 0.0f,   1.0f, 1.0f,	// front-bottom right
+		 0.5f, -0.5f, -0.5f,	0.0f, 1.0f, 0.0f,   1.0f, 0.0f,	// back-bottom right
+		-0.5f, -0.5f, -0.5f,	0.0f, 0.0f, 1.0f,   0.0f, 0.0f,	// back-bottom left
+		-0.5f, -0.5f,  0.5f,	1.0f, 1.0f, 0.0f,	0.0f, 1.0f,	// front-bottom left
 	};
 	
 
@@ -231,47 +240,59 @@ int main() {
 
 	// Transformations (Translate, Rotate, Scale)
 	glm::mat4 transform = glm::mat4(1.0f); // Initialize the transformation matrix as the identity matrix.
-	transform = glm::translate(transform, glm::vec3(-0.0f, -0.0f, -3.0f)); // Translate the transformation matrix.
+	transform = glm::translate(transform, glm::vec3(0.0f, 0.0f, -3.0f)); // Translate the transformation matrix.
 	transform = glm::rotate(transform, glm::radians(45.0f), glm::vec3(0.0f, 0.0f, 1.0f)); // Rotate the transformation matrix by 45 degrees on the z-axis.
 	transform = glm::scale(transform, glm::vec3(0.5f, 0.5f, 0.5f)); // Scale the transformation matrix.
+
 
 	//----------------------------------------------------
 	// RENDER LOOP
 	while (!glfwWindowShouldClose(window)) { // Check if the window should close, if not, render the next frame.
 
+		// Per-frame time logic
+		float currentFrame = static_cast<float>(glfwGetTime()); // Get the current time as seconds.
+		deltaTime = currentFrame - lastFrame; // Calculate the time difference between the current frame and the last frame.
+		lastFrame = currentFrame; // Set the lastFrame to the currentFrame.
+
+		// Input
 		processInput(window); // Check if the user has pressed the escape key, if so, close the window.
 
 		// Render
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f); // Set the color to clear the screen with.
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear the screen's color and depth buffer.
 
+		// Bind the textures
 		glActiveTexture(GL_TEXTURE0); // Activate the texture unit first before binding the texture.
 		glBindTexture(GL_TEXTURE_2D, texture1); // Bind the texture so that all subsequent texture commands will configure the currently bound texture.
-		
 		glActiveTexture(GL_TEXTURE1); // Activate the texture unit first before binding the texture.
 		glBindTexture(GL_TEXTURE_2D, texture2); // Bind the texture so that all subsequent texture commands will configure the currently bound texture.
 
 
-
 		// Draw the rectangle
 		myShader.use(); // Use the shader program.
+
+		// View matrix
+		glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp); // Set the view matrix.
+		myShader.setMat4("view", view); // Set the value of the uniform variable "view" in the shader program.
+
+		// Set the transformation matrix
 		unsigned int transformLoc = glGetUniformLocation(myShader.ID, "transform"); // Get the location of the uniform variable "transform" in the shader program.
 		glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform)); // Set the value of the uniform variable "transform" in the shader program.
 
 
 		// Set the model, view, and projection matrices.
 		glm::mat4 model = glm::mat4(1.0f); // Initialize the model matrix as the identity matrix.
-		glm::mat4 view = glm::mat4(1.0f); // Initialize the view matrix as the identity matrix.
 		glm::mat4 projection = glm::mat4(1.0f); // Initialize the projection matrix as the identity matrix.
 		
 		model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f)); // Rotate the model matrix.
-		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -5.0f)); // Translate the view matrix.
+		view += glm::translate(view, glm::vec3(0.0f, 0.0f, -5.0f)); // Translate the view matrix.
 		projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f); // Set the projection matrix.
 
-
+		
 		unsigned int modelLoc = glGetUniformLocation(myShader.ID, "model"); // Get the location of the uniform variable "model" in the shader program.
 		unsigned int viewLoc = glGetUniformLocation(myShader.ID, "view"); // Get the location of the uniform variable "view" in the shader program.
-
+		
+		// Set the model, view, and projection matrices.
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model)); // Set the value of the uniform variable "model" in the shader program.
 		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view)); // Set the value of the uniform variable "view" in the shader program.
 
@@ -300,16 +321,29 @@ int main() {
 
 }
 
-
+//-----------------------------------------------------------
 // USER INPUT
 void processInput(GLFWwindow* window) {
+	float cameraSpeed = static_cast<float>(2.5 * deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		cameraPos += cameraSpeed * cameraFront;
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+		cameraPos -= cameraSpeed * cameraFront;
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) { // If the escape key is pressed
 		glfwSetWindowShouldClose(window, true); // Set the expression to true so the window will close.
 	}
+
 }
+
 
 // CALLBACK FUNCTIONS
 void void_framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {		// Whenever the window is resized, this callback function executes. It adjusts the viewport so that the OpenGL renders to the new window size.
 		glViewport(0, 0, width, height);
 }
+
